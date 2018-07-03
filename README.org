@@ -1,0 +1,3 @@
+* fd-dired
+Provide a dired-mode interface for [[https://github.com/sharkdp/fd][fd]]'s' result. Same functionality as
+find-dired, using fd instead. Depend on find-dired.
