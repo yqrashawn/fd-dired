@@ -32,6 +32,8 @@
 (defvar fd-ls-option '("| xargs -0 ls -ld" . "-ld"))
 (defvar input-fd-args "")
 (defvar fd-args-history nil)
+
+;;;###autoload
 (defun fd-dired (dir args)
   "Run `fd' and go into Dired mode on a buffer of the output.
 The command run (after changing into DIR) is essentially
