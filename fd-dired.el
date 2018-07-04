@@ -1,10 +1,10 @@
 ;;; fd-dired.el --- find-dired alternative using fd  -*- lexical-binding: t; -*-
 
-;; Copyright © 2018, Rashawn Zhang, all rights reserved.
+;; Copyright © 2018, Free Software Foundation, Inc.
 
 ;; Author: Rashawn Zhang <namy.19@gmail.com>
 ;; Created:  3 July 2018
-;; Keywords:
+;; Keywords: tools, fd, find, dired
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@
 
 ;;  Provide a dired-mode interface for fd's result. Same functionality as
 ;;  find-dired, use fd instead. Depend on find-dired
+
+;; Just call `fd-dired'.
 
 ;;; Code:
 
