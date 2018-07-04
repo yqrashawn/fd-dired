@@ -2,6 +2,9 @@
 
 ;; Copyright © 2018, Free Software Foundation, Inc.
 
+;; Version: 0.1.0
+;; URL: https://github.com/yqrashawn/fd-dired
+;; Package-Requires: ((emacs "25"))
 ;; Author: Rashawn Zhang <namy.19@gmail.com>
 ;; Created:  3 July 2018
 ;; Keywords: tools, fd, find, dired
@@ -29,11 +32,11 @@
 ;;; Code:
 
 (require 'find-dired)
-(defvar fd-program "fd")
-(defvar pre-fd-args "-0 -c never")
-(defvar fd-ls-option '("| xargs -0 ls -ld" . "-ld"))
-(defvar input-fd-args "")
-(defvar fd-args-history nil)
+(defvar fd-dired-program "fd")
+(defvar fd-dired-pre-fd-args "-0 -c never")
+(defvar fd-dired-ls-option '("| xargs -0 ls -ld" . "-ld"))
+(defvar fd-dired-input-fd-args "")
+(defvar fd-dired-args-history nil)
 
 ;;;###autoload
 (defun fd-dired (dir args)
@@ -42,18 +45,18 @@ The command run (after changing into DIR) is essentially
 
     fd . ARGS -ls
 
-except that the car of the variable `fd-ls-option' specifies what to
+except that the car of the variable `fd-dired-ls-option' specifies what to
 use in place of \"-ls\" as the final argument."
   (interactive (list (and current-prefix-arg (read-directory-name "Run fd in directory: " nil "" t))
-                     (read-string "Run fd (with args): " input-fd-args
-                                  '(fd-args-history . 1))))
+                     (read-string "Run fd (with args): " fd-dired-input-fd-args
+                                  '(fd-dired-args-history . 1))))
   (let ((dired-buffers dired-buffers))
     ;; Expand DIR ("" means default-directory), and make sure it has a
     ;; trailing slash.
     (setq dir (file-name-as-directory (expand-file-name (or dir default-directory))))
     ;; Check that it's really a directory.
     (or (file-directory-p dir)
-        (error "fd-dired needs a directory: %s" dir))
+        (error "Fd-dired needs a directory: %s" dir))
     (switch-to-buffer (get-buffer-create "*Fd*"))
 
     ;; See if there's still a `fd' running, and offer to kill
@@ -76,8 +79,8 @@ use in place of \"-ls\" as the final argument."
     (setq buffer-read-only nil)
     (erase-buffer)
     (setq default-directory dir
-          input-fd-args args        ; save for next interactive call
-          args (concat fd-program " " pre-fd-args
+          fd-dired-input-fd-args args        ; save for next interactive call
+          args (concat fd-dired-program " " fd-dired-pre-fd-args
                        ;; " . "
                        (if (string= args "")
                            ""
@@ -85,16 +88,16 @@ use in place of \"-ls\" as the final argument."
                           " " args " "
                           " "))
                        (if (string-match "\\`\\(.*\\) {} \\(\\\\;\\|+\\)\\'"
-                                         (car fd-ls-option))
+                                         (car fd-dired-ls-option))
                            (format "%s %s %s"
-                                   (match-string 1 (car fd-ls-option))
+                                   (match-string 1 (car fd-dired-ls-option))
                                    (shell-quote-argument "{}")
                                    find-exec-terminator)
-                         (car fd-ls-option))))
+                         (car fd-dired-ls-option))))
     ;; Start the find process.
     (shell-command (concat args "&") (current-buffer))
     ;; The next statement will bomb in classic dired (no optional arg allowed)
-    (dired-mode dir (cdr fd-ls-option))
+    (dired-mode dir (cdr fd-dired-ls-option))
     (let ((map (make-sparse-keymap)))
       (set-keymap-parent map (current-local-map))
       (define-key map "\C-c\C-k" 'kill-find)
@@ -103,7 +106,7 @@ use in place of \"-ls\" as the final argument."
     (setq dired-sort-inhibit t)
     (set (make-local-variable 'revert-buffer-function)
          `(lambda (ignore-auto noconfirm)
-            (fd-dired ,dir ,input-fd-args)))
+            (fd-dired ,dir ,fd-dired-input-fd-args)))
     ;; Set subdir-alist so that Tree Dired will work:
     (if (fboundp 'dired-simple-subdir-alist)
         ;; will work even with nested dired format (dired-nstd.el,v 1.15
