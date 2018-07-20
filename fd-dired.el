@@ -56,7 +56,7 @@ use in place of \"-ls\" as the final argument."
     (setq dir (file-name-as-directory (expand-file-name (or dir default-directory))))
     ;; Check that it's really a directory.
     (or (file-directory-p dir)
-        (error "fd-dired needs a directory: %s" dir))
+        (error "Fd-dired needs a directory: %s" dir))
     (switch-to-buffer (get-buffer-create "*Fd*"))
 
     ;; See if there's still a `fd' running, and offer to kill
