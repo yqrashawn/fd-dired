@@ -24,8 +24,8 @@
 
 ;;; Commentary:
 
-;;  Provide a dired-mode interface for fd's result. Same functionality as
-;;  find-dired, use fd instead. Depend on find-dired
+;; Provide a dired-mode interface for fd's result.  Same functionality as
+;; find-dired, use fd instead.  Depend on find-dired.
 
 ;; Just call `fd-dired'.
 
@@ -135,4 +135,5 @@ use in place of \"-ls\" as the final argument."
     (setq mode-line-process '(":%s"))))
 
 (provide 'fd-dired)
+
 ;;; fd-dired.el ends here
