@@ -2,4 +2,4 @@
 Provide a dired-mode interface for [[https://github.com/sharkdp/fd][fd]]'s result. Same functionality as
 find-dired, using fd instead. Depend on find-dired.
 
-Check out [[https://www.masteringemacs.org/article/working-multiple-files-dired][this]] for functionality of ~find-dired~.
+Check out [[https://www.masteringemacs.org/article/working-multiple-files-dired][this]] for functionality and use case of ~find-dired~.
