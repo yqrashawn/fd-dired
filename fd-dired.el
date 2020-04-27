@@ -57,7 +57,7 @@ use in place of \"-ls\" as the final argument."
     ;; Check that it's really a directory.
     (or (file-directory-p dir)
         (error "Fd-dired needs a directory: %s" dir))
-    (switch-to-buffer (get-buffer-create "*Fd*"))
+    (switch-to-buffer-other-window (get-buffer-create "*Fd*"))
 
     ;; See if there's still a `fd' running, and offer to kill
     ;; it first, if it is.
