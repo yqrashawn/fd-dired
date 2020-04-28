@@ -57,11 +57,10 @@ use in place of \"-ls\" as the final argument."
     ;; Check that it's really a directory.
     (or (file-directory-p dir)
         (error "Fd-dired needs a directory: %s" dir))
-    (switch-to-buffer (get-buffer-create "*Fd*"))
 
     ;; See if there's still a `fd' running, and offer to kill
     ;; it first, if it is.
-    (let ((fd (get-buffer-process (current-buffer))))
+    (let ((fd (get-buffer-process (get-buffer "*Fd*"))))
       (when fd
         (if (or (not (eq (process-status fd) 'run))
                 (yes-or-no-p
@@ -74,65 +73,66 @@ use in place of \"-ls\" as the final argument."
               (error nil))
           (error "Cannot have two processes in `%s' at once" (buffer-name)))))
 
-    (widen)
-    (kill-all-local-variables)
-    (setq buffer-read-only nil)
-    (erase-buffer)
-    (setq default-directory dir
-          fd-dired-input-fd-args args        ; save for next interactive call
-          args (concat fd-dired-program " " fd-dired-pre-fd-args
-                       ;; " . "
-                       (if (string= args "")
-                           ""
-                         (concat
-                          " " args " "
-                          " "))
-                       (if (string-match "\\`\\(.*\\) {} \\(\\\\;\\|+\\)\\'"
-                                         (car fd-dired-ls-option))
-                           (format "%s %s %s"
-                                   (match-string 1 (car fd-dired-ls-option))
-                                   (shell-quote-argument "{}")
-                                   find-exec-terminator)
-                         (car fd-dired-ls-option))))
-    ;; Start the find process.
-    (shell-command (concat args "&") (current-buffer))
-    ;; The next statement will bomb in classic dired (no optional arg allowed)
-    (dired-mode dir (cdr fd-dired-ls-option))
-    (let ((map (make-sparse-keymap)))
-      (set-keymap-parent map (current-local-map))
-      (define-key map "\C-c\C-k" #'kill-find)
-      (use-local-map map))
-    (make-local-variable 'dired-sort-inhibit)
-    (setq dired-sort-inhibit t)
-    (set (make-local-variable 'revert-buffer-function)
-         `(lambda (ignore-auto noconfirm)
-            (fd-dired ,dir ,fd-dired-input-fd-args)))
-    ;; Set subdir-alist so that Tree Dired will work:
-    (if (fboundp 'dired-simple-subdir-alist)
-        ;; will work even with nested dired format (dired-nstd.el,v 1.15
-        ;; and later)
-        (dired-simple-subdir-alist)
-      ;; else we have an ancient tree dired (or classic dired, where
-      ;; this does no harm)
-      (set (make-local-variable 'dired-subdir-alist)
-           (list (cons default-directory (point-min-marker)))))
-    (set (make-local-variable 'dired-subdir-switches) find-ls-subdir-switches)
-    (setq buffer-read-only nil)
-    ;; Subdir headlerline must come first because the first marker in
-    ;; subdir-alist points there.
-    (insert "  " dir ":\n")
-    ;; Make second line a ``find'' line in analogy to the ``total'' or
-    ;; ``wildcard'' line.
-    (let ((point (point)))
-      (insert "  " args "\n")
-      (dired-insert-set-properties point (point)))
-    (setq buffer-read-only t)
-    (let ((proc (get-buffer-process (current-buffer))))
-      (set-process-filter proc (function find-dired-filter))
-      (set-process-sentinel proc (function find-dired-sentinel))
-      ;; Initialize the process marker; it is used by the filter.
-      (move-marker (process-mark proc) (point) (current-buffer)))
-    (setq mode-line-process '(":%s"))))
+    (with-current-buffer (get-buffer "*Fd*")
+      (widen)
+      (kill-all-local-variables)
+      (setq buffer-read-only nil)
+      (erase-buffer)
+      (setq default-directory dir
+            fd-dired-input-fd-args args        ; save for next interactive call
+            args (concat fd-dired-program " " fd-dired-pre-fd-args
+                         ;; " . "
+                         (if (string= args "")
+                             ""
+                           (concat
+                            " " args " "
+                            " "))
+                         (if (string-match "\\`\\(.*\\) {} \\(\\\\;\\|+\\)\\'"
+                                           (car fd-dired-ls-option))
+                             (format "%s %s %s"
+                                     (match-string 1 (car fd-dired-ls-option))
+                                     (shell-quote-argument "{}")
+                                     find-exec-terminator)
+                           (car fd-dired-ls-option))))
+      (shell-command (concat args " &") (get-buffer-create "*Fd*"))
+      ;; The next statement will bomb in classic dired (no optional arg allowed)
+      (dired-mode dir (cdr fd-dired-ls-option))
+      (let ((map (make-sparse-keymap)))
+        (set-keymap-parent map (current-local-map))
+        (define-key map "\C-c\C-k" #'kill-find)
+        (use-local-map map))
+      (make-local-variable 'dired-sort-inhibit)
+      (setq dired-sort-inhibit t)
+      (set (make-local-variable 'revert-buffer-function)
+           `(lambda (ignore-auto noconfirm)
+              (fd-dired ,dir ,fd-dired-input-fd-args)))
+      ;; Set subdir-alist so that Tree Dired will work:
+      (if (fboundp 'dired-simple-subdir-alist)
+          ;; will work even with nested dired format (dired-nstd.el,v 1.15
+          ;; and later)
+          (dired-simple-subdir-alist)
+        ;; else we have an ancient tree dired (or classic dired, where
+        ;; this does no harm)
+        (set (make-local-variable 'dired-subdir-alist)
+             (list (cons default-directory (point-min-marker)))))
+      (set (make-local-variable 'dired-subdir-switches) find-ls-subdir-switches)
+      (setq buffer-read-only nil)
+      ;; Subdir headlerline must come first because the first marker in
+      ;; subdir-alist points there.
+      (insert "  " dir ":\n")
+      ;; Make second line a ``find'' line in analogy to the ``total'' or
+      ;; ``wildcard'' line.
+      (let ((point (point)))
+        (insert "  " args "\n")
+        (dired-insert-set-properties point (point)))
+      (setq buffer-read-only t)
+      
+      (let ((proc (get-buffer-process (get-buffer "*Fd*"))))
+        (set-process-filter proc (function find-dired-filter))
+        (set-process-sentinel proc (function find-dired-sentinel))
+        ;; Initialize the process marker; it is used by the filter.
+        (move-marker (process-mark proc) (point) (get-buffer "*Fd*")))
+      (setq mode-line-process '(":%s")))))
 
 (provide 'fd-dired)
 
