@@ -78,11 +78,15 @@ use in place of \"-ls\" as the final argument."
       (kill-buffer "*Fd*"))
     (get-buffer-create "*Fd*")
     (display-buffer-below-selected (get-buffer "*Fd*") nil)
+
     (with-current-buffer (get-buffer "*Fd*")
+      ;; prepare buffer
       (widen)
       (kill-all-local-variables)
       (setq buffer-read-only nil)
       (erase-buffer)
+
+      ;; Start the process.
       (setq default-directory dir
             fd-dired-input-fd-args args        ; save for next interactive call
             args (concat fd-dired-program " " fd-dired-pre-fd-args
@@ -100,18 +104,22 @@ use in place of \"-ls\" as the final argument."
                                      find-exec-terminator)
                            (car fd-dired-ls-option))))
       (shell-command (concat args " &") (get-buffer-create "*Fd*"))
+
+      ;; enable Dired mode
       ;; The next statement will bomb in classic dired (no optional arg allowed)
       (dired-mode dir (cdr fd-dired-ls-option))
+      ;; provide a keybinding to kill the find process
       (let ((map (make-sparse-keymap)))
         (set-keymap-parent map (current-local-map))
         (define-key map "\C-c\C-k" #'kill-find)
         (use-local-map map))
+      ;; disable Dired sort
       (make-local-variable 'dired-sort-inhibit)
       (setq dired-sort-inhibit t)
       (set (make-local-variable 'revert-buffer-function)
            `(lambda (ignore-auto noconfirm)
               (fd-dired ,dir ,fd-dired-input-fd-args)))
-      ;; Set subdir-alist so that Tree Dired will work:
+      ;; Set `subdir-alist' so that Tree Dired will work:
       (if (fboundp 'dired-simple-subdir-alist)
           ;; will work even with nested dired format (dired-nstd.el,v 1.15
           ;; and later)
@@ -123,8 +131,9 @@ use in place of \"-ls\" as the final argument."
       (set (make-local-variable 'dired-subdir-switches) find-ls-subdir-switches)
       (setq buffer-read-only nil)
       ;; Subdir headlerline must come first because the first marker in
-      ;; subdir-alist points there.
+      ;; `subdir-alist' points there.
       (insert "  " dir ":\n")
+      
       ;; Make second line a ``find'' line in analogy to the ``total'' or
       ;; ``wildcard'' line.
       (let ((point (point)))
