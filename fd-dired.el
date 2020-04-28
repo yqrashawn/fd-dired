@@ -73,6 +73,11 @@ use in place of \"-ls\" as the final argument."
               (error nil))
           (error "Cannot have two processes in `%s' at once" (buffer-name)))))
 
+    ;; create a new buffer and display it below
+    (when (get-buffer "*Fd*")
+      (kill-buffer "*Fd*"))
+    (get-buffer-create "*Fd*")
+    (display-buffer-below-selected (get-buffer "*Fd*") nil)
     (with-current-buffer (get-buffer "*Fd*")
       (widen)
       (kill-all-local-variables)
