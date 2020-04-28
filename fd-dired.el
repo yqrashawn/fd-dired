@@ -90,7 +90,8 @@ use in place of \"-ls\" as the final argument."
     (get-buffer-create "*Fd*")
     (if fd-dired-display-in-current-window
         (display-buffer-same-window (get-buffer "*Fd*") nil)
-      (display-buffer-below-selected (get-buffer "*Fd*") nil))
+      (display-buffer-below-selected (get-buffer "*Fd*") nil)
+      (select-window (get-buffer-window "*Fd*")))
 
     (with-current-buffer (get-buffer "*Fd*")
       ;; prepare buffer
