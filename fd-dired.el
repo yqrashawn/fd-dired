@@ -38,6 +38,17 @@
 (defvar fd-dired-input-fd-args "")
 (defvar fd-dired-args-history nil)
 
+(defgroup fd-dired nil
+  "fd-dired customize group."
+  :prefix "fd-dired-"
+  :group 'fd-dired)
+
+(defcustom fd-dired-display-in-current-window t
+  "Whether display result"
+  :type 'boolean
+  :safe #'booleanp
+  :group 'fd-dired)
+
 ;;;###autoload
 (defun fd-dired (dir args)
   "Run `fd' and go into Dired mode on a buffer of the output.
@@ -77,7 +88,9 @@ use in place of \"-ls\" as the final argument."
     (when (get-buffer "*Fd*")
       (kill-buffer "*Fd*"))
     (get-buffer-create "*Fd*")
-    (display-buffer-below-selected (get-buffer "*Fd*") nil)
+    (if fd-dired-display-in-current-window
+        (display-buffer-same-window (get-buffer "*Fd*") nil)
+      (display-buffer-below-selected (get-buffer "*Fd*") nil))
 
     (with-current-buffer (get-buffer "*Fd*")
       ;; prepare buffer
