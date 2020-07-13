@@ -34,7 +34,7 @@
 (require 'find-dired)
 (defvar fd-dired-program "fd")
 (defvar fd-dired-pre-fd-args "-0 -c never")
-(defvar fd-dired-ls-option '("| xargs -0 ls -ld" . "-ld"))
+(defvar fd-dired-ls-option '("| xargs -0 ls -ld --quoting-style=literal" . "-ld"))
 (defvar fd-dired-input-fd-args "")
 (defvar fd-dired-args-history nil)
 
