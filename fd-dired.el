@@ -72,7 +72,7 @@ use in place of \"-ls\" as the final argument."
 
     (get-buffer-create fd-dired-buffer-name)
     (if fd-dired-display-in-current-window
-        (display-buffer-same-window (get-buffer fd-dired-buffer-name) nil)
+        (display-buffer (get-buffer fd-dired-buffer-name) nil)
       (display-buffer-below-selected (get-buffer fd-dired-buffer-name) nil)
       (select-window (get-buffer-window fd-dired-buffer-name)))
 
