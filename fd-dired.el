@@ -145,6 +145,16 @@ use in place of \"-ls\" as the final argument."
         (move-marker (process-mark proc) (point) (get-buffer fd-dired-buffer-name)))
       (setq mode-line-process '(":%s")))))
 
+(defun fd-dired-cleanup ()
+  "Clean up fd-dired created temp buffers for multiple searching processes."
+  (mapcar 'kill-buffer
+          (seq-filter
+           (lambda (buffer-name)
+             (string-match-p (rx (seq "*Fd " (zero-or-more nonl) "*")) buffer-name))
+           (mapcar 'buffer-name (buffer-list)))))
+
+(add-hook 'kill-emacs-hook #'fd-dired-cleanup)
+
 (provide 'fd-dired)
 
 ;;; fd-dired.el ends here
