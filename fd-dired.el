@@ -65,7 +65,7 @@ use in place of \"-ls\" as the final argument."
                            input
                          (setq input (format "\"%s\"" input))))))
   (let ((dired-buffers dired-buffers)
-        (fd-dired-buffer-name (format "*%s*" (make-temp-name "Fd "))))
+        (fd-dired-buffer-name (format " *%s*" (make-temp-name "Fd "))))
     ;; Expand DIR ("" means default-directory), and make sure it has a
     ;; trailing slash.
     (setq dir (file-name-as-directory (expand-file-name (or dir default-directory))))
