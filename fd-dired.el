@@ -59,11 +59,8 @@ The command run (after changing into DIR) is essentially
 except that the car of the variable `fd-dired-ls-option' specifies what to
 use in place of \"-ls\" as the final argument."
   (interactive (list (read-directory-name "Run fd in directory: " nil "" t)
-                     (let ((input (read-string "Run fd (with args and search): " fd-dired-input-fd-args
-                                               '(fd-dired-args-history . 1))))
-                       (if (and (string-prefix-p "\"" input) (string-suffix-p "\"" input))
-                           input
-                         (setq input (format "\"%s\"" input))))))
+                     (read-string "Run fd (with args and search): " fd-dired-input-fd-args
+                                  '(fd-dired-args-history . 1))))
   (let ((dired-buffers dired-buffers)
         (fd-dired-buffer-name (format " *%s*" (make-temp-name "Fd "))))
     ;; Expand DIR ("" means default-directory), and make sure it has a
