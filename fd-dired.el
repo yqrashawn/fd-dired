@@ -32,11 +32,15 @@
 ;;; Code:
 
 (require 'find-dired)
-(defvar fd-dired-program "fd")
-(defvar fd-dired-pre-fd-args "-0 -c never")
-(defvar fd-dired-ls-option '("| xargs -0 ls -ld --quoting-style=literal" . "-ld"))
-(defvar fd-dired-input-fd-args "")
-(defvar fd-dired-args-history nil)
+
+(defvar fd-dired-program "fd"
+  "The default fd program.")
+
+(defvar fd-dired-input-fd-args ""
+  "Last used fd arguments.")
+
+(defvar fd-dired-args-history nil
+  "History list of fd arguments entered in the minibuffer.")
 
 (defgroup fd-dired nil
   "fd-dired customize group."
@@ -47,6 +51,24 @@
   "Whether display result"
   :type 'boolean
   :safe #'booleanp
+  :group 'fd-dired)
+
+(defcustom fd-dired-pre-fd-args "-0 -c never"
+  "Fd argumens inserted before user arguments."
+  :type 'string
+  :group 'fd-dired)
+
+(defcustom fd-dired-ls-option '("| xargs -0 ls -ld --quoting-style=literal" . "-ld")
+  "A pair of options to produce and parse an `ls -l'-type list from `fd'.
+This is a cons of two strings (FD-ARGUMENTS . LS-SWITCHES).
+FD-ARGUMENTS is the option passed to `fd' to produce a file
+listing in the desired format.  LS-SWITCHES is a set of `ls'
+switches that tell dired how to parse the output of `fd'.
+
+For more information, see `FIND-LS-OPTION'."
+  :type '(cons :tag "Fd arguments pair"
+               (string :tag "Fd arguments")
+               (string :tag "Ls Switches"))
   :group 'fd-dired)
 
 ;;;###autoload
@@ -130,14 +152,14 @@ use in place of \"-ls\" as the final argument."
       ;; Subdir headlerline must come first because the first marker in
       ;; `subdir-alist' points there.
       (insert "  " dir ":\n")
-      
+
       ;; Make second line a ``find'' line in analogy to the ``total'' or
       ;; ``wildcard'' line.
       (let ((point (point)))
         (insert "  " args "\n")
         (dired-insert-set-properties point (point)))
       (setq buffer-read-only t)
-      
+
       (let ((proc (get-buffer-process (get-buffer fd-dired-buffer-name))))
         (set-process-filter proc (function find-dired-filter))
         (set-process-sentinel proc (function find-dired-sentinel))
