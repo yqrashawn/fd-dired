@@ -32,6 +32,8 @@
 ;;; Code:
 
 (require 'find-dired)
+(require 'ibuffer)
+(require 'ibuf-ext)
 
 (defvar fd-dired-program "fd"
   "The default fd program.")
@@ -71,6 +73,14 @@ For more information, see `FIND-LS-OPTION'."
                (string :tag "Ls Switches"))
   :group 'fd-dired)
 
+(defcustom fd-dired-generate-random-buffer nil
+  "Generate random buffer name.
+If this variable is non-nil, new fd-dired buffers will have
+random and hidden names."
+  :type 'boolean
+  :group 'fd-dired)
+
+
 ;;;###autoload
 (defun fd-dired (dir args)
   "Run `fd' and go into Dired mode on a buffer of the output.
@@ -84,7 +94,9 @@ use in place of \"-ls\" as the final argument."
                      (read-string "Run fd (with args and search): " fd-dired-input-fd-args
                                   '(fd-dired-args-history . 1))))
   (let ((dired-buffers dired-buffers)
-        (fd-dired-buffer-name (format " *%s*" (make-temp-name "Fd "))))
+        (fd-dired-buffer-name (if fd-dired-generate-random-buffer
+                                  (format " *%s*" (make-temp-name "Fd "))
+                                "*Fd*")))
     ;; Expand DIR ("" means default-directory), and make sure it has a
     ;; trailing slash.
     (setq dir (file-name-as-directory (expand-file-name (or dir default-directory))))
@@ -131,6 +143,7 @@ use in place of \"-ls\" as the final argument."
       (let ((map (make-sparse-keymap)))
         (set-keymap-parent map (current-local-map))
         (define-key map "\C-c\C-k" #'kill-find)
+        (define-key map (kbd "M-S") #'fd-dired-save-search-as-name)
         (use-local-map map))
       ;; disable Dired sort
       (make-local-variable 'dired-sort-inhibit)
@@ -176,6 +189,30 @@ use in place of \"-ls\" as the final argument."
            (mapcar 'buffer-name (buffer-list)))))
 
 (add-hook 'kill-emacs-hook #'fd-dired-cleanup)
+
+(defun fd-dired-save-search-as-name (newname)
+  "Save the search result in current result buffer.
+NEWNAME will be added to the result buffer name.  New searches will use the
+standard buffer unless the search is done from a saved buffer in
+which case the saved buffer will be reused."
+  (interactive "sSave search as name: ")
+  (let ((buffer (current-buffer)))
+    (when (and (string-match-p (rx bos (? " ") "*Fd") (buffer-name buffer))
+               (derived-mode-p 'dired-mode))
+      (with-current-buffer buffer
+        (rename-buffer (format "*Fd %s*" newname) t)))))
+
+(defun fd-dired-list-searches ()
+  "List all fd buffers in `ibuffer'."
+  (interactive)
+  (let ((buffer-name "*Searches fd*")
+        (other-window (equal current-prefix-arg '(4))))
+    (ibuffer other-window buffer-name
+             `((mode . dired-mode) (name . ,(rx bos "*Fd"))))
+    (with-current-buffer buffer-name
+      (ibuffer-auto-mode)
+      (set (make-local-variable 'ibuffer-use-header-line) nil)
+      (ibuffer-clear-filter-groups))))
 
 (provide 'fd-dired)
 
