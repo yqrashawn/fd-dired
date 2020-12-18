@@ -68,7 +68,7 @@
   :type 'string
   :group 'fd-dired)
 
-(defcustom fd-dired-ls-option `(,(concat "| xargs -0 " insert-directory-program " -ld --quoting-style=literal") . "-ld")
+(defcustom fd-dired-ls-option `(,(concat "| xargs -0 " insert-directory-program " -ld --quoting-style=literal | uniq") . "-ld")
   "A pair of options to produce and parse an `ls -l'-type list from `fd'.
 This is a cons of two strings (FD-ARGUMENTS . LS-SWITCHES).
 FD-ARGUMENTS is the option passed to `fd' to produce a file
@@ -187,6 +187,18 @@ use in place of \"-ls\" as the final argument."
         ;; Initialize the process marker; it is used by the filter.
         (move-marker (process-mark proc) (point) (get-buffer fd-dired-buffer-name)))
       (setq mode-line-process '(":%s")))))
+
+;;;###autoload
+(defun fd-name-dired (dir pattern)
+  "Search DIR recursively for files matching the globbing pattern PATTERN,
+and run Dired on those files.
+PATTERN is a shell wildcard (not an Emacs regexp) and need not be quoted.
+The default command run (after changing into DIR) is
+
+    fd . ARGS \\='PATTERN\\=' | fd-dired-ls-option"
+  (interactive
+   "DFd-name (directory): \nsFd-name (filename regexp): ")
+  (fd-dired dir (shell-quote-argument pattern)))
 
 ;;;###autoload
 (defun fd-grep-dired (dir regexp)
