@@ -38,6 +38,9 @@
 (defvar fd-dired-program "fd"
   "The default fd program.")
 
+(defvar fd-grep-dired-program "rg"
+  "The default fd grep program.")
+
 (defvar fd-dired-input-fd-args ""
   "Last used fd arguments.")
 
@@ -57,6 +60,11 @@
 
 (defcustom fd-dired-pre-fd-args "-0 -c never"
   "Fd argumens inserted before user arguments."
+  :type 'string
+  :group 'fd-dired)
+
+(defcustom fd-grep-dired-pre-grep-args "--color never --regexp"
+  "Fd grep argumens inserted before user arguments."
   :type 'string
   :group 'fd-dired)
 
@@ -179,6 +187,18 @@ use in place of \"-ls\" as the final argument."
         ;; Initialize the process marker; it is used by the filter.
         (move-marker (process-mark proc) (point) (get-buffer fd-dired-buffer-name)))
       (setq mode-line-process '(":%s")))))
+
+;;;###autoload
+(defun fd-grep-dired (dir regexp)
+  "Find files in DIR that contain matches for REGEXP and start Dired on output.
+The command run (after changing into DIR) is
+
+  fd . ARGS --exec rg --regexp REGEXP -0 -ls | fd-dired-ls-option"
+  (interactive "DFd-grep (directory): \nsFd-grep (rg regexp): ")
+  (fd-dired dir (concat "--exec " fd-grep-dired-program
+                        " " fd-grep-dired-pre-grep-args " "
+		                (shell-quote-argument regexp)
+                        " -0 -ls ")))
 
 (defun fd-dired-cleanup ()
   "Clean up fd-dired created temp buffers for multiple searching processes."
