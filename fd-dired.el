@@ -60,7 +60,7 @@
   :type 'string
   :group 'fd-dired)
 
-(defcustom fd-dired-ls-option '("| xargs -0 ls -ld --quoting-style=literal" . "-ld")
+(defcustom fd-dired-ls-option `(,(concat "| xargs -0 " insert-directory-program " -ld --quoting-style=literal") . "-ld")
   "A pair of options to produce and parse an `ls -l'-type list from `fd'.
 This is a cons of two strings (FD-ARGUMENTS . LS-SWITCHES).
 FD-ARGUMENTS is the option passed to `fd' to produce a file
