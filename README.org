@@ -3,3 +3,11 @@ Provide a dired-mode interface for [[https://github.com/sharkdp/fd][fd]]'s resul
 find-dired/find-grep-dired, using fd/rg instead. Depend on find-dired.
 
 Check out [[https://www.masteringemacs.org/article/working-multiple-files-dired][this]] for functionality and use case of ~find-dired~.
+
+* FAQ
+
+** macOS system command "ls" illegal option "--quoting-style=literal"
+
+The macOS system default '~ls~' command does not support option =--quoting-style=literal=.
+
+Please install with: ~brew install coreutils~
