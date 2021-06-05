@@ -69,7 +69,7 @@
   :group 'fd-dired)
 
 (defcustom fd-dired-ls-option
-  (case system-type
+  (pcase system-type
     ('gnu/linux
      `(,(concat "| xargs -0 " insert-directory-program " -ld --quoting-style=literal | uniq") . "-ld"))
     ('darwin
