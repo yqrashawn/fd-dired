@@ -59,12 +59,12 @@
   :group 'fd-dired)
 
 (defcustom fd-dired-pre-fd-args "-0 -c never"
-  "Fd argumens inserted before user arguments."
+  "Fd arguments inserted before user arguments."
   :type 'string
   :group 'fd-dired)
 
 (defcustom fd-grep-dired-pre-grep-args "--color never --regexp"
-  "Fd grep argumens inserted before user arguments."
+  "Fd grep arguments inserted before user arguments."
   :type 'string
   :group 'fd-dired)
 
