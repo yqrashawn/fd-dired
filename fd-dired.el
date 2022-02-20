@@ -89,13 +89,14 @@ For more information, see `FIND-LS-OPTION'."
                (string :tag "Ls Switches"))
   :group 'fd-dired)
 
-(defcustom fd-dired-generate-random-buffer nil
-  "Generate random buffer name.
-If this variable is non-nil, new fd-dired buffers will have
-random and hidden names."
-  :type 'boolean
-  :group 'fd-dired)
+(defcustom fd-dired-buffer-name-format "*Fd*"
+  "Format control string for fd-dired's buffer name.
+The first %s (optional) is substituted by a temporary name.
 
+For example: \(setq fd-dired-buffer-name-format \"*%s*\"\)
+makes fd-dired generate buffer names look like \"*Fd-LzJGv4*\"."
+  :type 'string-format
+  :group 'fd-dired)
 
 ;;;###autoload
 (defun fd-dired (dir args)
@@ -110,9 +111,7 @@ use in place of \"-ls\" as the final argument."
                      (read-string "Run fd (with args and search): " fd-dired-input-fd-args
                                   '(fd-dired-args-history . 1))))
   (let ((dired-buffers dired-buffers)
-        (fd-dired-buffer-name (if fd-dired-generate-random-buffer
-                                  (format " *%s*" (make-temp-name "Fd "))
-                                "*Fd*")))
+        (fd-dired-buffer-name (format fd-dired-buffer-name-format (make-temp-name "Fd "))))
     ;; Expand DIR ("" means default-directory), and make sure it has a
     ;; trailing slash.
     (setq dir (file-name-as-directory (expand-file-name (or dir default-directory))))
