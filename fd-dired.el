@@ -35,7 +35,10 @@
 (require 'ibuffer)
 (require 'ibuf-ext)
 
-(defvar fd-dired-program "fd"
+(defvar fd-dired-program (if (and (not (executable-find "fd"))
+                                  (executable-find "fdfind"))
+                             "fdfind"
+                           "fd")
   "The default fd program.")
 
 (defvar fd-grep-dired-program "rg"
